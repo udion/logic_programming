@@ -69,6 +69,7 @@ state(Crossings,pair(LB,RB),r,T):-
      T1 = T- max(TX,TY), T1>=0, %updated T
     =(LB1,[X|[Y|LB]]), %updated left bank
     delete(RB,X,RB_), delete(RB_,Y,RB1), %updated right bank
+    write("tracing back right to left with 2 people"),nl,
     state(Crossings1,pair(LB1,RB1),l,T1),
     append(Crossings1,[pair([X,Y],l)],Crossings).
 
@@ -79,6 +80,7 @@ state(Crossings,pair(LB,RB),r,T):-
     T1 = T-TX, T>=0,
     LB1=[X|LB],
     delete(RB,X,RB1),
+    write("tracing back right to left with 1 person"),nl,
     state(Crossings1,pair(LB1,RB1),l,T1),
     append(Crossings1,[pair([X],l)],Crossings).
 
@@ -91,6 +93,7 @@ state(Crossings,pair(LB,RB),l,T):-
     T1 = T- max(TX,TY), T1>=0, %updated T
     =(RB1,[X|[Y|RB]]), %updated left bank
     delete(LB,X,LB_), delete(LB_,Y,LB1), %updated right bank
+    write("tracing back left to right with 2 people"),nl,
     state(Crossings1,pair(LB1,RB1),r,T1),
     append(Crossings1,[pair([X,Y],r)],Crossings).
 
@@ -101,8 +104,68 @@ state(Crossings,pair(LB,RB),l,T):-
     T1 = T-TX, T>=0,
     RB1=[X|RB],
     delete(LB,X,LB1),
+    write("tracing back left to right with 1 person"),nl,
     state(Crossings1,pair(LB1,RB1),r,T1),
     append(Crossings1,[pair([X],r)],Crossings).
 
-goal(G):-
+goalB(G):-
     state(G,pair([],[a,b,c,d]),r,17).
+
+/** Now the same problem can also be solved using Forward-Reachability
+In this case the starting state will be
+state([],pair([a,b,c,d],[]),l,0).
+and final state will be
+state(Crossings,pair([],[a,b,c,d])),r,T) such that T<=17
+**/
+stateF(_,pair([],[a,b,c,d]),r,T):-
+    T=<17. %subtlty to get the desired output
+
+% when we move from left to right with 2 people
+stateF(Crossings,pair(LB,RB),l,T):-
+    member(X,LB),member(Y,LB),\=(X,Y),
+    time(X,TX),time(Y,TY),TX<TY,
+    T1=T+max(TX,TY),T1=<17,
+    delete(LB,X,LB_),delete(LB_,Y,LB1),
+    RB1=[X|[Y|RB]],
+    write("moving left to right with 2 people"),nl,
+    stateF(Crossings1,pair(LB1,RB1),r,T1),
+    write(Crossings1),nl,
+    append([pair([X,Y],l)],Crossings1,Crossings).
+% when we move from left to right with 1 person
+stateF(Crossings,pair(LB,RB),l,T):-
+    member(X,LB),
+    time(X,TX),
+    T1=T+TX,T1=<17,
+    delete(LB,X,LB1),
+    RB1=[X|RB],
+    write("moving left to right with 1 person"),nl,
+    stateF(Crossings1,pair(LB1,RB1),r,T1),
+    write(Crossings1),nl,
+    append([pair([X],l)],Crossings1,Crossings).
+
+% when we move from right to left with 2 people
+stateF(Crossings,pair(LB,RB),r,T):-
+    member(X,RB),member(Y,RB),\=(X,Y),
+    time(X,TX),time(Y,TY),TX<TY,
+    T1=T+max(TX,TY),T1=<17,
+    delete(RB,X,RB_),delete(RB_,Y,RB1),
+    LB1=[X|[Y|LB]],
+    write("moving right to left with 2 people"),nl,
+    stateF(Crossings1,pair(LB1,RB1),l,T1),
+    write(Crossings1),nl,
+    append([pair([X,Y],r)],Crossings1,Crossings).
+% when we move from right to left with 1 person
+stateF(Crossings,pair(LB,RB),r,T):-
+    member(X,RB),
+    time(X,TX),
+    T1=T+TX,T1=<17,
+    delete(RB,X,RB1),
+    LB1=[X|LB],
+    write("moving right to left with 1 person"),nl,
+    stateF(Crossings1,pair(LB1,RB1),l,T1),
+    write(Crossings1),nl,
+    append([pair([X],r)],Crossings1,Crossings).
+
+goalF(G):-
+    stateF(S,pair([a,b,c,d],[]),l,0),
+    reverse(S,G).
