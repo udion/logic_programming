@@ -55,4 +55,22 @@ my_flatten([H|T],F):-
     my_length(T,L), L \= 0,
     my_flatten(T,F2),
     append(F1,F2,F).
+
+%predicate to compress a string
+compress([],C):-
+    C=[].
+compress([H],C):-
+    C=[H].
+compress([H|T],C):-
+    compress(T,[H_|T_]),
+    H \= H_,
+    append([H],[H_|T_],C).
+compress([H|T],C):-
+    compress(T,[H_|T_]),
+    H \= H_,
+    append([H],[H_|T_],C).
+compress([H|T],C):-
+    compress(T,[H_|T_]),
+    H = H_,
+    C = [H_|T_].
     
