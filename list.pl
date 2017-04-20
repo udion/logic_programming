@@ -40,3 +40,19 @@ my_reverse([H|T],Rev):-
 is_pallindrome(L):-
     my_reverse(L,Lrev),
     Lrev = L.
+
+%predicate to flatten the nested list structure
+my_flatten([],F):-
+    F=[].
+my_flatten([H],F):-
+    not(is_list(H)),
+    F=[H].
+my_flatten([H],F):-
+    is_list(H),
+    my_flatten(H,F).
+my_flatten([H|T],F):-
+    my_flatten([H],F1),
+    my_length(T,L), L \= 0,
+    my_flatten(T,F2),
+    append(F1,F2,F).
+    
