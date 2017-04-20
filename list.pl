@@ -28,3 +28,10 @@ my_length([_],L):-
 my_length([_|T],L):-
     my_length(T,L_),
     L is L_+1.
+
+%predicate to reverse a list
+my_reverse([],Rev):-
+    Rev = [].
+my_reverse([H|T],Rev):-
+    my_reverse(T,R_),
+    append(R_,[H],Rev).
