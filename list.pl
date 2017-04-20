@@ -35,3 +35,8 @@ my_reverse([],Rev):-
 my_reverse([H|T],Rev):-
     my_reverse(T,R_),
     append(R_,[H],Rev).
+
+%predicate to check for palindrome
+is_pallindrome(L):-
+    my_reverse(L,Lrev),
+    Lrev = L.
