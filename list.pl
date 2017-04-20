@@ -73,4 +73,18 @@ compress([H|T],C):-
     compress(T,[H_|T_]),
     H = H_,
     C = [H_|T_].
-    
+
+%predicate to  pack consecutive same elements of the list in sublists
+pack([],P):-
+    P=[].
+pack([X],P):-
+    P=[[X]].
+pack([H|T],P):-
+    pack(T,[[H_|Tt]|T_]),
+    H=H_,
+    append([H],[H_|Tt],Hh),
+    append([Hh],T_,P).
+pack([H|T],P):-
+    pack(T,[[H_|Tt]|T_]),
+    H \= H_,
+    append([[H]],[[H_|Tt]|T_],P).
